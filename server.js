@@ -48,8 +48,12 @@ async function getPhotos(request, response) {
   let URL = `https://api.unsplash.com/search/photos/?client_id=${process.env.UNSPLASH_API_KEY}&query=${query}`;
   try {
     let getPhoto = await axios.get(URL);
-    console.log(getPhoto.data);
-    response.status(200).send(getPhoto.data);
+    //console.log(getPhoto.data.results);
+    let photosToSend = getPhoto.data.results.map(photoObj => {
+      return new Photo(photoObj);
+    });
+
+    response.status(200).send(photosToSend);
   }
   catch (error) {
     response.status(404).send('Unable to get photo');
@@ -67,4 +71,12 @@ function getAllGames(request, response) {
   //send it to the requestor (client)
   response.status(200).send(allGamesArr);
 
+}
+
+class Photo {
+  constructor(photo) {
+    this.artist = photo.user.name;
+    this.image_url = photo.urls.raw;
+    this.description = photo.description;
+  }
 }
